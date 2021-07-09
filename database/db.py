@@ -152,6 +152,7 @@ def generate_pickup(slot, order, total_weight):
                     weight_left = current_carrier_capacity - i
                     current_carrier_trip -= 1
                     current_carrier_capacity -= i
+
     return orders
 
 
