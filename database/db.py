@@ -72,17 +72,11 @@ def get_all_partners():
     return res
 
 
-def get_orders_assigned():
-    return [10, 20]
+def get_order_delivery(order_ids, order_weights):
 
-
-def get_order_delivery(order_id, order_weights):
-    res = []
-    cursor = grofers_db.delivery_partners.find({"order_id": order_id})
-    for x in cursor:
-        res.append({"vechicle_type": get_vechicle_type(x['carrier_id']),
-                    "delivery_partner_id": x['delivery_partner_id'],
-                    "list_of_order_ids_assigned": get_orders_assigned()})
+    res = [{"vechicle_type": 'bike',
+            "delivery_partner_id": 2,
+            "list_of_order_ids_assigned": order_ids}]
     return res
 
 

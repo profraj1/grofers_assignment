@@ -36,12 +36,14 @@ def get_partners():
 
 @app.route("/orders", methods=['POST'])
 def get_assigned_orders():
-    results = []
+    order_ids = []
+    order_wts = []
     req_data = request.get_json()
     for data in list(req_data):
-        results.append(get_order_delivery(
-            data['order_id'], data['order_weight']))
+        order_ids.append(data['order_id'])
+        order_wts.append(data['order_weight'])
 
+    results = get_order_delivery(order_ids, order_wts)
     return Response(response=dumps(results, indent=2))
 
 
