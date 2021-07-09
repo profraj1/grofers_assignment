@@ -43,7 +43,7 @@ def get_assigned_orders():
         order_ids.append(data['order_id'])
         order_wts.append(data['order_weight'])
 
-    results = get_order_delivery(order_ids, order_wts)
+    results = get_order_delivery(1, order_ids, order_wts)
     return Response(response=dumps(results, indent=2))
 
 

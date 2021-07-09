@@ -41,6 +41,119 @@ try:
 except:
     print("Data Already Exist")
 
+slot_1_carriers = [2, 3]
+slot_2_carriers = [1, 2, 3]
+slot_3_carriers = [1, 2, 3]
+slot_4_carriers = [1]
+total_trip = [1, 2, 3]
+capacity_per_trip = [100, 50, 30]
+
+
+def print_array(arr):
+    print(arr)
+
+
+def swap(arr, a, b):
+    tmp = arr[a]
+    arr[a] = arr[b]
+    arr[b] = tmp
+    return arr
+
+
+def get_all_combinations(arr, n):
+    if (n == len(arr)):
+        output.append(arr.copy())
+    else:
+        for i in range(n, len(arr)):
+            arr = swap(arr, n, i)
+            get_all_combinations(arr, n+1)
+            arr = swap(arr, n, i)
+
+
+def get_vehicle_type(typeId):
+    if (typeId == 1):
+        return "truck"
+    elif (typeId == 2):
+        return "scooter"
+    else:
+        return "bike"
+
+
+def get_slot(slotId):
+    if(slotId == 1):
+        return slot_1_carriers
+    elif(slotId == 2):
+        return slot_2_carriers
+    elif(slotId == 3):
+        return slot_3_carriers
+    else:
+        return slot_4_carriers
+
+
+def generate_pickup(slot, order, total_weight):
+    weight_left = 0
+    j = 0
+    orderId = 1
+    orders = []
+    carriers = get_slot(slot)
+    current_carrier = carriers[j]
+    current_carrier_capacity = capacity_per_trip[current_carrier - 1]
+    current_carrier_trip = total_trip[current_carrier - 1]
+    current_order = {"vechicle_type": get_vehicle_type(
+        current_carrier), "delivery_partner_id": 1, "list_of_order_ids_assigned": []}
+    # print(current_order.delivery_partner_id)
+    for i in order:
+        if (total_weight <= 0):
+            orders[len(orders) - 1]['list_of_order_ids_assigned'].append(i)
+            break
+        else:
+            if (i > current_carrier_capacity):
+                orderId += 1
+                orders.append(orderId)
+                j += 1
+                if (j < len(carriers)):
+                    current_carrier = carriers[j]
+                    total_weight -= capacity_per_trip[current_carrier - 1]
+                    weight_left = capacity_per_trip[current_carrier - 1] - i
+            else:
+                total_weight -= current_carrier_capacity
+                weight_left = current_carrier_capacity - i
+                current_carrier_trip -= 1
+                current_carrier_capacity -= i
+                if (current_carrier_capacity <= 0 and current_carrier_trip > 0):
+                    current_order = {"vechicle_type": get_vehicle_type(
+                        current_carrier), "delivery_partner_id": orderId, "list_of_order_ids_assigned": []}
+                    orderId += 1
+                    current_carrier_capacity = capacity_per_trip[current_carrier - 1]
+                    delievered_order = current_order['list_of_order_ids_assigned']
+                    delievered_order.append(i)
+                    current_order['list_of_order_ids_assigned'] = delievered_order
+                    orders.append(current_order.copy())
+                elif (current_carrier_capacity > 0 and current_carrier_trip > 0):
+                    current_order = {"vechicle_type": get_vehicle_type(
+                        current_carrier), "delivery_partner_id": orderId, "list_of_order_ids_assigned": []}
+                    delievered_order = current_order['list_of_order_ids_assigned']
+                    delievered_order.append(i)
+                    current_order['list_of_order_ids_assigned'] = delievered_order
+                    orders.append(current_order.copy())
+                else:
+                    orderId += 1
+                    j += 1
+                    current_carrier = carriers[j]
+                    current_order = {"vechicle_type": get_vehicle_type(
+                        current_carrier), "delivery_partner_id": orderId, "list_of_order_ids_assigned": []}
+                    delievered_order = current_order['list_of_order_ids_assigned']
+                    delievered_order.append(i)
+                    current_order['list_of_order_ids_assigned'] = delievered_order
+                    orders.append(current_order.copy())
+                    current_carrier_capacity = capacity_per_trip[current_carrier - 1]
+                    current_carrier_trip = total_trip[current_carrier - 1]
+                    total_weight -= current_carrier_capacity
+                    weight_left = current_carrier_capacity - i
+                    current_carrier_trip -= 1
+                    current_carrier_capacity -= i
+    return orders
+
 
 def get_all_carriers():
     res = []
@@ -72,11 +185,10 @@ def get_all_partners():
     return res
 
 
-def get_order_delivery(order_ids, order_weights):
+def get_order_delivery(slot, order_ids, order_wts):
+    total_weight = sum(order_wts)
 
-    res = [{"vechicle_type": 'bike',
-            "delivery_partner_id": 2,
-            "list_of_order_ids_assigned": order_ids}]
+    res = generate_pickup(slot, order_ids, total_weight)
     return res
 
 
